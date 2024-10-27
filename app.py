@@ -34,36 +34,42 @@ def search_video():
     #global data
 
     str = request.args.get('url')
-    str = str[32:]
+
+    if "v=" in str:
+        str = str.split("v=")[1].split("&")[0]
+        url = "https://yt-api.p.rapidapi.com/dl"
+        querystring = {"id":str,"cgeo":"DE"}
+        headers = {
+            "x-rapidapi-key": "72ea23ea89mshf6775ef3b0dde3cp1c8da5jsn0d645a94c48c",
+            "x-rapidapi-host": "yt-api.p.rapidapi.com"
+        }
+
+        response = requests.get(url, headers=headers, params=querystring)
+        data = response.json()
     
-    url = "https://yt-api.p.rapidapi.com/dl"
-    querystring = {"id":str,"cgeo":"DE"}
-    headers = {
-        "x-rapidapi-key": "72ea23ea89mshf6775ef3b0dde3cp1c8da5jsn0d645a94c48c",
-        "x-rapidapi-host": "yt-api.p.rapidapi.com"
-    }
+        if 'formats' in data:
 
-    response = requests.get(url, headers=headers, params=querystring)
-    data = response.json()
- 
-    if 'formats' in data:
+            data_to_html = {
+                'Titulo': data.get('title','video'),
+                'Image_url': data.get('thumbnail','no tm')[4]['url']
+            }
 
-        data_to_html = {
-            'Titulo': data.get('title','video'),
-            'Image_url': data.get('thumbnail','no tm')[4]['url']
-        }
+            download_info = {
+                'Titulo': data.get('title','video'),
+                'URL': data.get('formats','no data')[0]['url']
+            }
 
-        download_info = {
-            'Titulo': data.get('title','video'),
-            'URL': data.get('formats','no data')[0]['url']
-        }
+            # Guardamos los datos de la API en la sesión
+            session['data'] = download_info
+            #return data.get('formats','no formats')
+            return render_template('video_found.html', data = data_to_html)
+    else:
 
-        # Guardamos los datos de la API en la sesión
-        session['data'] = download_info
-        #return data.get('formats','no formats')
-        return render_template('video_found.html', data = data_to_html)
+        return 'Video url not valid'
+    
+    
 
-    return 'Video url not valid'
+    
     
 @app.route('/descarga')
 def descarga():
