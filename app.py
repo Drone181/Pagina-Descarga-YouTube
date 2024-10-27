@@ -80,8 +80,10 @@ def descarga():
         return "Error: No hay datos para descargar", 400
     
     download_url = data['URL']
+
+    return download_url
     
-    # Obtener el título del video para usarlo como nombre del archivo
+    ''' # Obtener el título del video para usarlo como nombre del archivo
     video_title = data['Titulo']
     # Limpiar el título para usarlo como nombre de archivo
     video_title = "".join(x for x in video_title if x.isalnum() or x in (' ','-','_'))
@@ -109,7 +111,7 @@ def descarga():
                 os.remove(temp_path)
             except Exception as error:
                 app.logger.error("Error removing downloaded file", error)
-            return response
+            return response'''
     
     
 
