@@ -1,0 +1,16 @@
+{% extends './layout.html' %}
+
+{% block title %}{{data.Titulo}}{% endblock %}
+
+{% block body%}
+<h1>{{data.Titulo}}</h1>
+        <img src={{data.Image_url}} id="video_image">
+    <a href="/descarga" class="button">
+        <br>
+        <button type="button">Descargar</button>
+    </a>
+
+    <br>
+    {% endblock %}
+
+    

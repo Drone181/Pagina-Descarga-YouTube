@@ -1,0 +1,12 @@
+body {
+    background-color: rgb(219, 152, 152);
+}
+
+block1 {
+    color: whitesmoke;
+}
+
+#video_image {
+    width: 480px;
+    height: 270px;
+}

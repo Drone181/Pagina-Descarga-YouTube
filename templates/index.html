@@ -1,0 +1,28 @@
+{% extends './layout.html' %}
+
+{% block title %}{{data.Titulo}}{% endblock %}
+
+{% block body%}
+<h1>{{data.bienvenida}}</h1>
+    <!-- {% if data.numero_cursos > 0 %}
+    <ul>
+        {% for c in data.cursos %}
+        <li>{{ c }}</li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <h2> No existen cursos...</h2>
+    {% endif %} -->
+
+    <form action="/search_video" method="get">
+        <label for="url">YouTube Url:</label><br>
+        <input type="text" id="url" name="url" required><br>
+        <button type="submit">Descargar</button>
+    </form>
+
+    <!-- <a href="https://www.facebook.com/" class="button">
+        <button type="button">Facebook</button>
+    </a> -->
+    {% endblock %}
+
+    
