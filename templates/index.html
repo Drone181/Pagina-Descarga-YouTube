@@ -1,16 +1,35 @@
-<!-- index.html -->
-{% extends './layout.html' %}
+{% extends 'layout.html' %}
 
-{% block title %}{{data.Titulo}}{% endblock %}
+{% block title %}{{ data.Titulo }}{% endblock %}
 
 {% block body %}
-<div id="main_text">
-    {{data.bienvenida}}
-</div>
+<div class="contenedor">
+    <div id="main_text">
+        {{ data.bienvenida }}
+    </div>
 
-<form action="/search_video" id="youtubeForm" method="GET">
-    <label for="youtube-url">YouTube Url:</label>
-    <input type="text" id="youtube-url" name="url">
-    <button type="submit">Buscar</button>
-</form>
+    <form id="youtubeForm" action="{{ url_for('search_video') }}" method="GET">
+        <label for="youtube-url">YouTube Url:</label>
+        <input type="text" id="youtube-url" name="url" placeholder="Por favor ingrese una URL de YouTube" required>
+        <button type="submit">Buscar</button>
+    </form>
+
+    {% if data.error %}
+    <div class="alert alert-error" style="display: block;">
+        {{ data.error }}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('youtubeForm').addEventListener('submit', function(e) {
+    const url = document.getElementById('youtube-url').value;
+    if (!url.includes('youtube.com') && !url.includes('youtu.be')) {
+        e.preventDefault();
+        alert('Por favor ingrese una URL válida de YouTube');
+    }
+});
+</script>
 {% endblock %}
