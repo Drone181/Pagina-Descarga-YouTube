@@ -1,12 +1,62 @@
-<!-- layout.html -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{% endblock %}</title>
-    <style>
+    <!-- Usar url_for para referenciar archivos estáticos -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/layout_styles.css') }}">
+    <!-- <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}"> -->
+     <style>
         /* layout_styles.css */
+        .back-link {
+            display: inline-block;
+            color: whitesmoke;
+            text-decoration: none;
+            margin-bottom: 20px;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .back-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .download-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .download-btn:hover {
+            background-color: #218838;
+        }
+
+        .alert {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px 30px;
+            border-radius: 4px;
+            color: white;
+            z-index: 1000;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -20px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
+        }
+
         body {
             background-color: #e72e2e;
             /* background: linear-gradient(to bottom, #e72e2e); */
@@ -216,8 +266,7 @@
                 max-width: 600px;
             }
         }
-    </style>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout_styles.css') }}">
+     </style>
 </head>
 <body>
     <div id="alertContainer" class="alert">
