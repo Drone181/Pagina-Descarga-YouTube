@@ -20,7 +20,7 @@ def index():
         'bienvenida': 'YouTube Video Downloader',
         'error': error
     }
-    return render_template('/templates/index.html', data=data)
+    return render_template('index.html', data=data)
 
 @app.route('/search_video')
 def search_video():

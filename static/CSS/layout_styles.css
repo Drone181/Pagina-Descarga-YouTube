@@ -1,5 +1,5 @@
 /* layout_styles.css */
-.back-link {
+/* .back-link {
     display: inline-block;
     color: whitesmoke;
     text-decoration: none;
@@ -46,7 +46,7 @@
     from { opacity: 0; transform: translate(-50%, -20px); }
     to { opacity: 1; transform: translate(-50%, 0); }
 }
-
+ */
 body {
     background-color: #e72e2e;
     /* background: linear-gradient(to bottom, #e72e2e); */
@@ -57,7 +57,7 @@ body {
     background-attachment: fixed;
 }
 
-block1 {
+/* block1 {
     color: whitesmoke;
 }
 
@@ -91,9 +91,9 @@ block1 {
     object-fit: cover;
     padding-top: 5px;
     padding-right: 30px;
-}
+} */
 
-.contenedor {
+/* .contenedor {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -135,9 +135,9 @@ form {
     display: flex;
     flex-direction: column;
     gap: 10px;
-} 
+}  */
 
-input[type="text"] {
+/* input[type="text"] {
     width: 100%;
     padding: 12px;
     margin: 8px 0;
@@ -163,9 +163,9 @@ button[type="button"] {
 button[type="submit"]:hover,
 button[type="button"]:hover {
     background-color: #0056b3;
-}
+} */
 
-label {
+/* label {
     font-family: Cambria;
     font-size: clamp(16px, 3vw, 20px);
     font-weight: bold;
@@ -178,9 +178,9 @@ label {
     width: min(500px, 90%);
     margin: 20px auto;
 }
-
+ */
 /* Media Queries mejorados */
-@media screen and (min-width: 768px) {
+/* @media screen and (min-width: 768px) {
     form {
         gap: 15px;
     }
@@ -199,7 +199,6 @@ label {
 
 @media screen and (max-width: 480px) {
     body {
-        /* background: linear-gradient(to bottom,  45%, #fffffe 45%); */
         background-color: #e72e2e;
     }
 
@@ -224,10 +223,10 @@ label {
         top: 200px;
         left: 50%;
     }
-}
+} */
 
 /* Para pantallas muy pequeñas */
-@media screen and (max-width: 320px) {
+/* @media screen and (max-width: 320px) {
     #main_text, 
     #video_title {
         font-size: 18px;
@@ -241,9 +240,9 @@ label {
         padding: 10px;
     }
 }
-
+ */
 /* Para pantallas muy grandes */
-@media screen and (min-width: 1440px) {
+/* @media screen and (min-width: 1440px) {
     .contenedor {
         max-width: 1400px;
     }
@@ -255,4 +254,4 @@ label {
     form {
         max-width: 600px;
     }
-}
+} */
