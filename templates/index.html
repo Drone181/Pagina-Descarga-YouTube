@@ -10,7 +10,7 @@
 
     <form id="youtubeForm" action="{{ url_for('search_video') }}" method="GET">
         <label for="youtube-url">YouTube Url:</label>
-        <input type="text" id="youtube-url" name="url" required>
+        <input type="text" id="youtube-url" name="url" placeholder="Por favor ingrese una URL de YouTube" required>
         <button type="submit">Buscar</button>
     </form>
 
@@ -20,4 +20,16 @@
     </div>
     {% endif %}
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('youtubeForm').addEventListener('submit', function(e) {
+    const url = document.getElementById('youtube-url').value;
+    if (!url.includes('youtube.com') && !url.includes('youtu.be')) {
+        e.preventDefault();
+        alert('Por favor ingrese una URL válida de YouTube');
+    }
+});
+</script>
 {% endblock %}

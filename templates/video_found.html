@@ -1,25 +1,58 @@
 {% extends 'layout.html' %}
 
-{% block title %}{{data.Titulo}}{% endblock %}
+{% block title %}{{ data.Titulo }}{% endblock %}
 
 {% block body %}
-<form id="youtubeForm" action="{{ url_for('search_video') }}" method="GET">
-    <label for="youtube-url">YouTube Url:</label>
-    <input type="text" id="youtube-url" name="url" required>
-    <button type="submit">Buscar</button>
-</form>
-
-<div id="video_title">
-    {{data.Titulo}}
-</div>
-
 <div class="contenedor">
-    <img src="{{data.Image_url}}" id="video_image" alt="Video thumbnail">
-</div>
+    <div id="main_text">
+        <a href="{{ url_for('index') }}" class="back-link">← Volver al inicio</a>
+    </div>
 
-<div class="download_button">
-    <a href="{{ url_for('descarga') }}">
-        <button type="button">Descargar</button>
-    </a>
+    <form id="youtubeForm" action="{{ url_for('search_video') }}" method="GET">
+        <label for="youtube-url">YouTube Url:</label>
+        <input type="text" id="youtube-url" name="url" required>
+        <button type="submit">Buscar</button>
+    </form>
+
+    {% if data.Titulo %}
+    <div id="video_title">
+        {{ data.Titulo }}
+    </div>
+
+    <div class="contenedor">
+        {% if data.Image_url %}
+        <img src="{{ data.Image_url }}" id="video_image" alt="Video thumbnail">
+        {% endif %}
+    </div>
+
+    <div class="download_button">
+        <form action="{{ url_for('descarga') }}" method="GET" id="downloadForm">
+            <button type="submit" class="download-btn">Descargar</button>
+        </form>
+    </div>
+    {% endif %}
+
+    {% if error %}
+    <div class="alert alert-error" style="display: block;">
+        {{ error }}
+    </div>
+    {% endif %}
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('youtubeForm').addEventListener('submit', function(e) {
+    const url = document.getElementById('youtube-url').value;
+    if (!url.includes('youtube.com') && !url.includes('youtu.be')) {
+        e.preventDefault();
+        alert('Por favor ingrese una URL válida de YouTube');
+    }
+});
+
+document.getElementById('downloadForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    window.location.href = "{{ url_for('descarga') }}";
+});
+</script>
 {% endblock %}
