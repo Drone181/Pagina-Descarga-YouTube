@@ -1,12 +1,15 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify, send_file, g, session, Response, stream_with_context
 import requests
 import logging
-import tempfile
 import os
 import urllib.request
+from werkzeug.middleware.proxy_fix import ProxyFix
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/static', static_folder='static')
 app.secret_key = 'my_very_secure_secret_key_1!'
+
+# Configurar para trabajar detrás de proxy
+app.wsgi_app = ProxyFix(app.wsgi_app, x_prefix=1)
 
 # Configurar logging
 logging.basicConfig(level=logging.INFO)
