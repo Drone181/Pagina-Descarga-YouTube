@@ -1,5 +1,4 @@
-<!-- index.html -->
-{% extends './layout.html' %}
+{% extends 'layout.html' %}
 
 {% block title %}{{data.Titulo}}{% endblock %}
 
@@ -8,9 +7,15 @@
     {{data.bienvenida}}
 </div>
 
-<form id="youtubeForm" method="GET">
+<form id="youtubeForm" action="{{ url_for('search_video') }}" method="GET">
     <label for="youtube-url">YouTube Url:</label>
-    <input type="text" id="youtube-url" name="url">
+    <input type="text" id="youtube-url" name="url" required>
     <button type="submit">Buscar</button>
 </form>
+
+{% if data.error %}
+<div class="alert alert-error" style="display: block;">
+    {{ data.error }}
+</div>
+{% endif %}
 {% endblock %}
