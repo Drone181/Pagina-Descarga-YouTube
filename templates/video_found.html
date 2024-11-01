@@ -4,7 +4,7 @@
 {% block title %}{{data.Titulo}}{% endblock %}
 
 {% block body %}
-<form id="youtubeForm" method="POST">
+<form action="/search_video" id="youtubeForm" method="POST">
     <label for="youtube-url">YouTube Url:</label>
     <input type="text" id="youtube-url" name="url" >
     <button type="submit">Buscar</button>
