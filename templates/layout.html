@@ -7,6 +7,17 @@
     <!-- Usar url_for para referenciar archivos estáticos -->
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/layout_styles.css') }}">
     <!-- <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}"> -->
+     <style>
+        body {
+            background-color: #e72e2e;
+            /* background: linear-gradient(to bottom, #e72e2e); */
+            background-size: 100% 100%;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            background-attachment: fixed;
+        }
+     </style>
 </head>
 <body>
     <div id="alertContainer" class="alert">
