@@ -1,21 +1,23 @@
 {% extends 'layout.html' %}
 
-{% block title %}{{data.Titulo}}{% endblock %}
+{% block title %}{{ data.Titulo }}{% endblock %}
 
 {% block body %}
-<div id="main_text">
-    {{data.bienvenida}}
-</div>
+<div class="contenedor">
+    <div id="main_text">
+        {{ data.bienvenida }}
+    </div>
 
-<form id="youtubeForm" action="{{ url_for('search_video') }}" method="GET">
-    <label for="youtube-url">YouTube Url:</label>
-    <input type="text" id="youtube-url" name="url" required>
-    <button type="submit">Buscar</button>
-</form>
+    <form id="youtubeForm" action="{{ url_for('search_video') }}" method="GET">
+        <label for="youtube-url">YouTube Url:</label>
+        <input type="text" id="youtube-url" name="url" required>
+        <button type="submit">Buscar</button>
+    </form>
 
-{% if data.error %}
-<div class="alert alert-error" style="display: block;">
-    {{ data.error }}
+    {% if data.error %}
+    <div class="alert alert-error" style="display: block;">
+        {{ data.error }}
+    </div>
+    {% endif %}
 </div>
-{% endif %}
 {% endblock %}
