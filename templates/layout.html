@@ -1,102 +1,20 @@
+<!-- layout.html -->
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/layout_styles.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{% endblock %}</title>
-    <!-- <style>
-        table, th, td {
-            border: 1px solid black;
-        }
-    </style> -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout_styles.css') }}">
 </head>
 <body>
-    <block1>
-        {% block body%}
-        {% endblock %}
-    </block1>
-    <!-- <script src="{{ url_for('static', filename='JS/layout.js') }}"></script> -->
-    
-    <!-- <table style="width: 500px;">
-        <thead>
-            <tr>
-                <th>Producto</th>
-                <th>Precio</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Hola beats</td>
-                <td>Gratis</td>
-            </tr>
-            <tr>
-                <td>Chachito feliz</td>
-                <td>19.90$</td>
-            </tr>
-            <tr>
-                <td>Chachito feliz muy feliz</td>
-                <td>29.90$</td>
-            </tr>
-        </tbody>
-        <tboot>
-            <td></td>
-            <td>Total: 49.80$</td>
-        </tboot>
-    </table> -->
-    <!-- ul es lista no ordenada -->
-    <!-- <ul>
-        <li>Elemento 1</li>
-        <li>Elemento 2</li>
-        <li>Elemento 3</li>
-        <li>Elemento 4</li>
-    </ul> -->
-    <!-- ul es lista ordenada -->
-    <!-- <ol>
-        <li value="50" >Elemento 1</li>
-        <li>Elemento 2</li>
-        <li>Elemento 3</li>
-        <li>Elemento 4</li>
-        <li>
-            <ol>
-                <li style="list-style-type: lower-alpha;">sub elemento 1</li>
-                <li style="list-style-type: lower-alpha;">sub elemento 2</li>
-                <li style="list-style-type: lower-alpha;">sub elemento 3</li>
-            </ol>
-        </li>
-    </ol>
-    <form action="/formulario" method="POST" >
-        <label for="nombre" >Ingresa tu nombre</label>
-        <input value="" type="text" id="nombre" name="nombre" placeholder="Nombre    Ex.Diana" />
-        <br>
-        <label for="apellido" >Ingresa tu apellido</label>
-        <input value="" type="text" id="apellido" name="apellido" placeholder="Apellido    Ex.Garcia" />
-        <br>
-        <label for="comentario" >Comentario</label>
-        <textarea cols="50" rows="10" id="comentario" placeholder="ingrese un comentario" name="comentario" >Este es un valor por defecto</textarea>
-        <br>
-        <button type="button" >Tipo boton</button>
-        <button type="reset" >Tipo reset</button>
-        <button type="submit" >Tipo submit</button>
-    </form> -->
-    <!-- contenido de nuestra pagina web -->
-    <!-- <h1>First text </h1>
-    <h2>Second text</h2>
-    <h3>Third text</h3>
-    <h4>Fourth text</h4>
-    <h5>Fifth text</h5>
-    <h6>Holiwis</h6>
-    <p>Hola como estas</p>
-    <p>yo muy bien</p>
-    <hr>
-    <h2>Chanchito felipe</h2>
-    <p>
-        Este texto es <span style="color:blue">mucho mas largo</span> 
-        y es para mostrar <br><br>
-        la etiqueta de span!
-    </p> -->
-    <!-- comment line, just like the top one -->
-    
-    
-    <!-- <a target="_blank" href="https://www.google.com">Ir a google home page  </a> -->
-    <!-- <img src="{{ url_for('static', filename='images/mr_fresh.jpg') }}" width="200"/> -->
+    <div id="alertContainer" class="alert">
+        <span id="alertMessage"></span>
+    </div>
+
+    {% block body %}{% endblock %}
+
+    <script src="{{ url_for('static', filename='js/layout.js') }}"></script>
+    {% block scripts %}{% endblock %}
 </body>
 </html>

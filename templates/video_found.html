@@ -1,16 +1,27 @@
+<!-- video_found.html -->
 {% extends './layout.html' %}
 
 {% block title %}{{data.Titulo}}{% endblock %}
 
-{% block body%}
-<h1>{{data.Titulo}}</h1>
-        <img src={{data.Image_url}} id="video_image">
-    <a href="/descarga" class="button">
-        <br>
+{% block body %}
+<form id="youtubeForm" method="POST">
+    <label for="youtube-url">YouTube Url:</label>
+    <input type="text" id="youtube-url" name="url" required>
+    <button type="submit">Buscar</button>
+</form>
+
+<div id="video_title">
+    {{data.Titulo}}
+</div>
+
+<div class="contenedor">
+    <img src="{{data.Image_url}}" id="video_image" alt="Video thumbnail">
+</div>
+
+<div class="download_button">
+    <a href="/descarga">
         <button type="button">Descargar</button>
     </a>
-
-    <br>
-    {% endblock %}
-
     
+</div>
+{% endblock %}
