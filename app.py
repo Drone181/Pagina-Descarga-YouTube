@@ -204,7 +204,6 @@ def search_video():
 
 @app.route('/descarga')
 def descarga():
-    
     download_info = session.get('data')
     
     if not download_info:
@@ -214,20 +213,24 @@ def descarga():
     video_title = download_info['Titulo']
 
     try:
-        response = requests.get(video_url, stream=True)
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36'
+        }
+        response = requests.get(video_url, headers=headers, stream=True)
         
         if response.status_code == 200:
             return Response(
                 response.iter_content(chunk_size=1024),
-                content_type=response.headers.get('Content-type','application/octet-stream'),
+                content_type=response.headers.get('Content-type', 'application/octet-stream'),
                 headers={
-                    'Content-Disposition': 'attachment; filename=vide.mp4'
+                    'Content-Disposition': f'attachment; filename="{video_title}.mp4"'
                 }
             )
         else:
-            return f"Error a; descargar el video: Codigo de estado {response.status_code}",500
+            return f"Error al descargar el video: Código de estado {response.status_code}", 500
     except requests.RequestException as e:
-        return f"Error de conexion al intentar descargar el video {e}", 500
+        return f"Error de conexión al intentar descargar el video {e}", 500
+
     
     """ try:    
         # Sanitizar el nombre del archivo
