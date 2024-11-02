@@ -238,13 +238,14 @@ def descarga():
             'Content-Type': 'video/mp4'
         }
 
-        return Response(
+        return video_url
+        """ return Response(
             stream_with_context(generate()),
             headers = {
             'Content-Disposition': f'attachment; filename="{video_title}"',
             'Content-Type': 'video/mp4'
         }
-        )
+        ) """
 
     except Exception as e:
         logging.error(f"Error in descarga: {str(e)}")
