@@ -25,11 +25,14 @@
         {% endif %}
     </div>
 
-    <div class="download_button">
+    <!-- <div class="download_button">
         <a href="{{ url_for('descarga') }}">
-            <button type="button">Descargar</button>
+            
         </a>
-    </div>
+    </div> -->
+    <a href="{{ url_for('descarga') }}" class="download_button">
+        <button type="button">Descargar</button>
+    </a>
     {% endif %}
 
     {% if error %}
