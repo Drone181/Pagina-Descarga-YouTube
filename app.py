@@ -211,44 +211,49 @@ def descarga():
         
         video_url = download_info['URL']
         video_title = download_info['Titulo']
-        video_ext = download_info.get('ext', 'mp4')
         
-        # Sanitize filename
-        # Limpiar el título para usarlo como nombre de archivo
-        video_title = "".join(x for x in video_title if x.isalnum() or x in (' ', '-', '_'))
-        filename = f"{video_title}.{video_ext}"
+        # Sanitizar el nombre del archivo
+        video_title = "".join(x for x in video_title if x.isalnum() or x in (' ', '-', '_'))[:100]  # Limitar longitud
+        filename = f"{video_title}.mp4"
+
+        # Configurar headers específicos para la descarga
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3',
+            'Accept': '*/*',
+            'Accept-Encoding': 'identity',  # Evitar compresión
+            'Connection': 'keep-alive'
+        }
 
         def generate():
+            req = urllib.request.Request(video_url, headers=headers)
             try:
-                with urllib.request.urlopen(video_url) as response:
+                with urllib.request.urlopen(req) as response:
+                    # Leer y transmitir el contenido en chunks
                     while True:
-                        chunk = response.read(1024*10)  # 8KB chunks
+                        chunk = response.read(1024 * 64)  # 64KB chunks para mejor rendimiento
                         if not chunk:
                             break
                         yield chunk
-            except HTTPError as e:
-                logging.error(f"HTTP Error during download: {str(e)}")
-                yield b''
             except Exception as e:
-                logging.error(f"Error during download: {str(e)}")
-                yield b''
+                logging.error(f"Error durante la descarga: {str(e)}")
+                return redirect(url_for('index', error='Error durante la descarga'))
 
-        headers = {
-            'Content-Disposition': f'attachment; filename="{video_title}"',
-            'Content-Type': 'video/mp4'
+        response_headers = {
+            'Content-Disposition': f'attachment; filename="{filename}"',
+            'Content-Type': 'video/mp4',
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0',
+            'Transfer-Encoding': 'chunked'
         }
 
-        return video_url
-        """ return Response(
+        return Response(
             stream_with_context(generate()),
-            headers = {
-            'Content-Disposition': f'attachment; filename="{video_title}"',
-            'Content-Type': 'video/mp4'
-        }
-        ) """
+            headers=response_headers
+        )
 
     except Exception as e:
-        logging.error(f"Error in descarga: {str(e)}")
+        logging.error(f"Error en descarga: {str(e)}")
         return redirect(url_for('index', error='Error durante la descarga'))
 
 @app.errorhandler(404)
