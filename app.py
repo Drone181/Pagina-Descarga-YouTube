@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify, send_file, g, session,Response, stream_with_context
+""" from flask import Flask, render_template, request, redirect, url_for, jsonify, send_file, g, session,Response, stream_with_context
 import requests
 import logging
 import tempfile
@@ -126,3 +126,150 @@ if __name__ == '__main__':
     #app.run(debug=True, port=5000)
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
 
+ """
+
+from flask import Flask, render_template, request, redirect, url_for, jsonify, session, Response, stream_with_context
+import requests
+import logging
+import os
+import urllib.request
+from urllib.error import HTTPError
+import time
+
+app = Flask(__name__)
+app.secret_key = 'my_very_secure_secret_key_1!'
+logging.basicConfig(level=logging.INFO)
+
+@app.before_request
+def before_request():
+    logging.info('Before request...')
+
+@app.after_request
+def after_request(response):
+    logging.info('After request...')
+    return response
+
+@app.route('/')
+def index():
+    error = request.args.get('error')
+    data = {
+        'Titulo': 'Home',
+        'bienvenida': 'YouTube Video Downloader',
+        'error': error
+    }
+    return render_template('index.html', data=data)
+
+@app.route('/search_video', methods=['GET'])
+def search_video():
+    try:
+        video_url = request.args.get('url')
+
+        if not video_url:
+            return redirect(url_for('index'))
+
+        if "v=" not in video_url:
+            return redirect(url_for('index', error='URL de video no válida'))
+
+        video_id = video_url.split("v=")[1].split("&")[0]
+        url = "https://yt-api.p.rapidapi.com/dl"
+        querystring = {"id": video_id, "cgeo": "DE"}
+        headers = {
+            "x-rapidapi-key": "72ea23ea89mshf6775ef3b0dde3cp1c8da5jsn0d645a94c48c",
+            "x-rapidapi-host": "yt-api.p.rapidapi.com"
+        }
+
+        response = requests.get(url, headers=headers, params=querystring)
+        data = response.json()
+
+        if 'formats' not in data:
+            return redirect(url_for('index', error='No se pudo obtener la información del video'))
+
+        # Get the best quality format that's not too large
+        formats = data.get('formats', [])
+        selected_format = None
+        for format in formats:
+            if format.get('quality', '') == '720p' and format.get('ext', '') == 'mp4':
+                selected_format = format
+                break
+        
+        if not selected_format:
+            selected_format = formats[0]  # Fallback to first format
+
+        download_info = {
+            'Titulo': data.get('title', 'video'),
+            'URL': selected_format['url'],
+            'format': selected_format.get('quality', 'default'),
+            'ext': selected_format.get('ext', 'mp4')
+        }
+
+        data_to_html = {
+            'Titulo': download_info['Titulo'],
+            'Image_url': data.get('thumbnail', [])[4]['url'] if len(data.get('thumbnail', [])) > 4 else None
+        }
+
+        session['download_info'] = download_info
+        return render_template('video_found.html', data=data_to_html)
+
+    except Exception as e:
+        logging.error(f"Error in search_video: {str(e)}")
+        return redirect(url_for('index', error='Ocurrió un error al procesar el video'))
+
+@app.route('/descarga')
+def descarga():
+    try:
+        download_info = session.get('download_info')
+        
+        if not download_info:
+            return redirect(url_for('index', error='No hay información de descarga disponible'))
+        
+        video_url = download_info['URL']
+        video_title = download_info['Titulo']
+        video_ext = download_info.get('ext', 'mp4')
+        
+        # Sanitize filename
+        video_title = "".join(x for x in video_title if x.isalnum() or x in (' ', '-', '_'))
+        filename = f"{video_title}.{video_ext}"
+
+        def generate():
+            try:
+                with urllib.request.urlopen(video_url) as response:
+                    while True:
+                        chunk = response.read(8192)  # 8KB chunks
+                        if not chunk:
+                            break
+                        yield chunk
+            except HTTPError as e:
+                logging.error(f"HTTP Error during download: {str(e)}")
+                yield b''
+            except Exception as e:
+                logging.error(f"Error during download: {str(e)}")
+                yield b''
+
+        headers = {
+            'Content-Disposition': f'attachment; filename="{filename}"',
+            'Content-Type': 'video/mp4',
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+        }
+
+        return Response(
+            stream_with_context(generate()),
+            headers=headers
+        )
+
+    except Exception as e:
+        logging.error(f"Error in descarga: {str(e)}")
+        return redirect(url_for('index', error='Error durante la descarga'))
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return redirect(url_for('index', error='Página no encontrada'))
+
+@app.errorhandler(500)
+def server_error(e):
+    return redirect(url_for('index', error='Error interno del servidor'))
+
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
