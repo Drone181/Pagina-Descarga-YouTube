@@ -204,7 +204,7 @@ def search_video():
 @app.route('/descarga')
 def descarga():
     try:
-        download_info = session.get('download_info')
+        download_info = session.get('data')
         
         if not download_info:
             return redirect(url_for('index', error='No hay información de descarga disponible'))
