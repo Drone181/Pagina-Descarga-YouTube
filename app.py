@@ -213,44 +213,57 @@ def descarga():
         video_title = download_info['Titulo']
         
         # Sanitizar el nombre del archivo
-        video_title = "".join(x for x in video_title if x.isalnum() or x in (' ', '-', '_'))[:100]  # Limitar longitud
+        video_title = "".join(x for x in video_title if x.isalnum() or x in (' ', '-', '_'))[:100]
         filename = f"{video_title}.mp4"
 
-        # Configurar headers específicos para la descarga
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3',
+        # Headers para la solicitud
+        request_headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
             'Accept': '*/*',
-            'Accept-Encoding': 'identity',  # Evitar compresión
-            'Connection': 'keep-alive'
+            'Accept-Encoding': 'identity;q=1, *;q=0',
+            'Range': 'bytes=0-',
+            'Connection': 'keep-alive',
+            'Referer': 'https://www.youtube.com/'
         }
 
         def generate():
-            req = urllib.request.Request(video_url, headers=headers)
             try:
-                with urllib.request.urlopen(req) as response:
-                    # Leer y transmitir el contenido en chunks
-                    while True:
-                        chunk = response.read(1024 * 64)  # 64KB chunks para mejor rendimiento
-                        if not chunk:
-                            break
-                        yield chunk
-            except Exception as e:
+                # Usar requests para hacer la solicitud con stream=True
+                with requests.get(video_url, headers=request_headers, stream=True) as r:
+                    r.raise_for_status()  # Verificar si hay errores HTTP
+                    for chunk in r.iter_content(chunk_size=8192):
+                        if chunk:
+                            yield chunk
+            except requests.RequestException as e:
                 logging.error(f"Error durante la descarga: {str(e)}")
-                return redirect(url_for('index', error='Error durante la descarga'))
+                return
 
+        # Headers para la respuesta
         response_headers = {
             'Content-Disposition': f'attachment; filename="{filename}"',
             'Content-Type': 'video/mp4',
             'Cache-Control': 'no-cache, no-store, must-revalidate',
             'Pragma': 'no-cache',
-            'Expires': '0',
-            'Transfer-Encoding': 'chunked'
+            'Expires': '0'
         }
 
-        return Response(
-            stream_with_context(generate()),
-            headers=response_headers
-        )
+        try:
+            # Verificar que la URL es accesible antes de iniciar la descarga
+            head_response = requests.head(video_url, headers=request_headers)
+            head_response.raise_for_status()
+            
+            # Si el servidor proporciona el tamaño del contenido, añadirlo a los headers
+            if 'content-length' in head_response.headers:
+                response_headers['Content-Length'] = head_response.headers['content-length']
+
+            return Response(
+                stream_with_context(generate()),
+                headers=response_headers
+            )
+
+        except requests.RequestException as e:
+            logging.error(f"Error al verificar el video: {str(e)}")
+            return redirect(url_for('index', error='Error al acceder al video'))
 
     except Exception as e:
         logging.error(f"Error en descarga: {str(e)}")
