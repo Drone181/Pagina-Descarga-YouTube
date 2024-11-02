@@ -132,9 +132,10 @@ from flask import Flask, render_template, request, redirect, url_for, jsonify, s
 import requests
 import logging
 import os
+import re
 import urllib.request
 from urllib.error import HTTPError
-import time
+import datetime
 
 app = Flask(__name__)
 app.secret_key = 'my_very_secure_secret_key_1!'
@@ -203,15 +204,32 @@ def search_video():
 
 @app.route('/descarga')
 def descarga():
+    
+    download_info = session.get('data')
+    
+    if not download_info:
+        return redirect(url_for('index', error='No hay información de descarga disponible'))
+    
+    video_url = download_info['URL']
+    video_title = download_info['Titulo']
+
     try:
-        download_info = session.get('data')
+        response = requests.get(video_url, stream=True)
         
-        if not download_info:
-            return redirect(url_for('index', error='No hay información de descarga disponible'))
-        
-        video_url = download_info['URL']
-        video_title = download_info['Titulo']
-        
+        if response.status_code == 200:
+            return Response(
+                response.iter_content(chunk_size=1024),
+                content_type=response.headers.get('Content-type','application/octet-stream'),
+                headers={
+                    'Content-Disposition': 'attachment; filename=vide.mp4'
+                }
+            )
+        else:
+            return f"Error a; descargar el video: Codigo de estado {response.status_code}",500
+    except requests.RequestException as e:
+        return f"Error de conexion al intentar descargar el video {e}", 500
+    
+    """ try:    
         # Sanitizar el nombre del archivo
         video_title = "".join(x for x in video_title if x.isalnum() or x in (' ', '-', '_'))[:100]
         filename = f"{video_title}.mp4"
@@ -267,7 +285,7 @@ def descarga():
 
     except Exception as e:
         logging.error(f"Error en descarga: {str(e)}")
-        return redirect(url_for('index', error='Error durante la descarga'))
+        return redirect(url_for('index', error='Error durante la descarga')) """
 
 @app.errorhandler(404)
 def page_not_found(e):
