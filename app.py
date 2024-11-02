@@ -161,18 +161,19 @@ def index():
 
 @app.route('/search_video', methods=['GET'])
 def search_video():
+    str = request.args.get('url')
+
+    if not str:
+        #return jsonify({'error': 'Por favor ingrese una URL de YouTube'}), 400
+        return redirect(url_for('index'))
+
+    if "v=" not in str:
+        return jsonify({'error': 'URL de video no válida'}), 400
+
     try:
-        video_url = request.args.get('url')
-
-        if not video_url:
-            return redirect(url_for('index'))
-
-        if "v=" not in video_url:
-            return redirect(url_for('index', error='URL de video no válida'))
-
-        video_id = video_url.split("v=")[1].split("&")[0]
+        str = str.split("v=")[1].split("&")[0]
         url = "https://yt-api.p.rapidapi.com/dl"
-        querystring = {"id": video_id, "cgeo": "DE"}
+        querystring = {"id":str,"cgeo":"DE"}
         headers = {
             "x-rapidapi-key": "72ea23ea89mshf6775ef3b0dde3cp1c8da5jsn0d645a94c48c",
             "x-rapidapi-host": "yt-api.p.rapidapi.com"
@@ -182,37 +183,23 @@ def search_video():
         data = response.json()
 
         if 'formats' not in data:
-            return redirect(url_for('index', error='No se pudo obtener la información del video'))
-
-        # Get the best quality format that's not too large
-        formats = data.get('formats', [])
-        selected_format = None
-        for format in formats:
-            if format.get('quality', '') == '720p' and format.get('ext', '') == 'mp4':
-                selected_format = format
-                break
-        
-        if not selected_format:
-            selected_format = formats[0]  # Fallback to first format
-
-        download_info = {
-            'Titulo': data.get('title', 'video'),
-            'URL': selected_format['url'],
-            'format': selected_format.get('quality', 'default'),
-            'ext': selected_format.get('ext', 'mp4')
-        }
+            return jsonify({'error': 'No se pudo obtener la información del video'}), 400
 
         data_to_html = {
-            'Titulo': download_info['Titulo'],
-            'Image_url': data.get('thumbnail', [])[4]['url'] if len(data.get('thumbnail', [])) > 4 else None
+            'Titulo': data.get('title','video'),
+            'Image_url': data.get('thumbnail','no tm')[4]['url']
         }
 
-        session['download_info'] = download_info
+        download_info = {
+            'Titulo': data.get('title','video'),
+            'URL': data.get('formats','no data')[0]['url']
+        }
+
+        session['data'] = download_info
         return render_template('video_found.html', data=data_to_html)
 
     except Exception as e:
-        logging.error(f"Error in search_video: {str(e)}")
-        return redirect(url_for('index', error='Ocurrió un error al procesar el video'))
+        return jsonify({'error': 'Ocurrió un error al procesar el video'}), 400
 
 @app.route('/descarga')
 def descarga():
