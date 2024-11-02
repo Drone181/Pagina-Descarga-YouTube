@@ -203,34 +203,39 @@ def search_video():
 
 @app.route('/descarga')
 def descarga():
-    # Obtener los datos de la sesión
-    data = session.get('data')
-    
-    if not data:
-        return "Error: No hay datos para descargar", 400
-    
-    download_url = data['URL']
-    video_title = data['Titulo']
-    # Limpiar el título para usarlo como nombre de archivo
-    video_title = "".join(x for x in video_title if x.isalnum() or x in (' ', '-', '_'))
-    
-    # Definir la función de flujo para transmitir el contenido del video
-    def generate():
-        with urllib.request.urlopen(download_url) as response:
-            while True:
-                chunk = response.read(1024 * 10)  # Leer en bloques de 10KB
-                if not chunk:
-                    break
-                yield chunk
+    try:
+        # Obtener los datos de la sesión
+        data = session.get('data')
+        
+        if not data:
+            return "Error: No hay datos para descargar", 400
+        
+        download_url = data['URL']
+        video_title = data['Titulo']
+        # Limpiar el título para usarlo como nombre de archivo
+        video_title = "".join(x for x in video_title if x.isalnum() or x in (' ', '-', '_'))
+        
+        # Definir la función de flujo para transmitir el contenido del video
+        def generate():
+            with urllib.request.urlopen(download_url) as response:
+                while True:
+                    chunk = response.read(1024 * 10)  # Leer en bloques de 10KB
+                    if not chunk:
+                        break
+                    yield chunk
 
-    # Crear una respuesta en flujo con el nombre de archivo adecuado
-    return Response(
-        stream_with_context(generate()),
-        headers={
-            'Content-Disposition': f'attachment; filename="{video_title}.mp4"',
-            'Content-Type': 'video/mp4'
-        }
-    )
+        # Crear una respuesta en flujo con el nombre de archivo adecuado
+        return Response(
+            stream_with_context(generate()),
+            headers={
+                'Content-Disposition': f'attachment; filename="{video_title}.mp4"',
+                'Content-Type': 'video/mp4'
+            }
+        )
+
+    except Exception as e:
+        logging.error(f"Error in descarga: {str(e)}")
+        return redirect(url_for('index', error='Error durante la descarga'))
 
 @app.errorhandler(404)
 def page_not_found(e):
