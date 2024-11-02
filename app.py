@@ -204,33 +204,46 @@ def search_video():
 @app.route('/descarga')
 def descarga():
     try:
-        # Obtener los datos de la sesión
-        data = session.get('data')
+        download_info = session.get('data')
         
-        if not data:
-            return "Error: No hay datos para descargar", 400
+        if not download_info:
+            return redirect(url_for('index', error='No hay información de descarga disponible'))
         
-        download_url = data['URL']
-        video_title = data['Titulo']
+        video_url = download_info['URL']
+        video_title = download_info['Titulo']
+        video_ext = download_info.get('ext', 'mp4')
+        
+        # Sanitize filename
         # Limpiar el título para usarlo como nombre de archivo
         video_title = "".join(x for x in video_title if x.isalnum() or x in (' ', '-', '_'))
-        
-        # Definir la función de flujo para transmitir el contenido del video
-        def generate():
-            with urllib.request.urlopen(download_url) as response:
-                while True:
-                    chunk = response.read(1024 * 10)  # Leer en bloques de 10KB
-                    if not chunk:
-                        break
-                    yield chunk
+        filename = f"{video_title}.{video_ext}"
 
-        # Crear una respuesta en flujo con el nombre de archivo adecuado
+        def generate():
+            try:
+                with urllib.request.urlopen(video_url) as response:
+                    while True:
+                        chunk = response.read(1024*10)  # 8KB chunks
+                        if not chunk:
+                            break
+                        yield chunk
+            except HTTPError as e:
+                logging.error(f"HTTP Error during download: {str(e)}")
+                yield b''
+            except Exception as e:
+                logging.error(f"Error during download: {str(e)}")
+                yield b''
+
+        headers = {
+            'Content-Disposition': f'attachment; filename="{video_title}"',
+            'Content-Type': 'video/mp4'
+        }
+
         return Response(
             stream_with_context(generate()),
-            headers={
-                'Content-Disposition': f'attachment; filename="{video_title}.mp4"',
-                'Content-Type': 'video/mp4'
-            }
+            headers = {
+            'Content-Disposition': f'attachment; filename="{video_title}"',
+            'Content-Type': 'video/mp4'
+        }
         )
 
     except Exception as e:
