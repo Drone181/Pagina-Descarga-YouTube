@@ -33,6 +33,11 @@
     <a href="{{ url_for('descarga') }}" class="download_button">
         <button type="button">Descargar</button>
     </a>
+
+    <a href="{{ data.Video_url }}" target="_blank">
+        <img src="ruta_a_miniatura.jpg" alt="Vista previa del video" style="width: 560px; height: 315px;">
+      </a>
+      
     {% endif %}
 
     {% if error %}
