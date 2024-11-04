@@ -34,9 +34,11 @@
         <button type="button">Descargar</button>
     </a>
 
-    <a href="{{ data.Video_url }}" target="_blank">
-        <img src="ruta_a_miniatura.jpg" alt="Vista previa del video" style="width: 560px; height: 315px;">
-      </a>
+    <video width="560" height="315" controls>
+        <source src="{{ data.Video_url }}" type="video/mp4">
+        Tu navegador no soporta el elemento de video.
+      </video>
+      
       
     {% endif %}
 
