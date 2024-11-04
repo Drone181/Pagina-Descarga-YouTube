@@ -20,8 +20,11 @@
     </div>
 
     <div class="contenedor">
-        {% if data.Image_url %}
-        <img src="{{ data.Image_url }}" id="video_image" alt="Video thumbnail">
+        {% if data.Video_url %}
+        <video width="560" height="315" controls>
+            <source src="{{ data.Video_url }}" type="video/mp4">
+            Tu navegador no soporta el elemento de video.
+        </video>
         {% endif %}
     </div>
 
@@ -30,14 +33,11 @@
             
         </a>
     </div> -->
-    <a href="{{ url_for('descarga') }}" class="download_button">
+    <!-- <a href="{{ url_for('descarga') }}" class="download_button">
         <button type="button">Descargar</button>
-    </a>
+    </a> -->
 
-    <video width="560" height="315" controls>
-        <source src="{{ data.Video_url }}" type="video/mp4">
-        Tu navegador no soporta el elemento de video.
-      </video>
+    
       
       
     {% endif %}
