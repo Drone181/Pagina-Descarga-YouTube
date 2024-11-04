@@ -203,7 +203,7 @@ def search_video():
     except Exception as e:
         return jsonify({'error': 'Ocurrió un error al procesar el video'}), 400
 
-@app.route('/descarga')
+""" @app.route('/descarga')
 def descarga():
     download_info = session.get('data')
     
@@ -230,66 +230,45 @@ def descarga():
         else:
             return f"Error al descargar el video: Código de estado {response.status_code}", 500
     except requests.RequestException as e:
-        return f"Error de conexión al intentar descargar el video {e}", 500
+        return f"Error de conexión al intentar descargar el video {e}", 500 """
 
+@app.route('/descarga')
+def descarga():
+    download_info = session.get('data')
     
-    """ try:    
-        # Sanitizar el nombre del archivo
-        video_title = "".join(x for x in video_title if x.isalnum() or x in (' ', '-', '_'))[:100]
-        filename = f"{video_title}.mp4"
+    if not download_info:
+        return redirect(url_for('index', error='No hay información de descarga disponible'))
+    
+    video_url = download_info['URL']
+    video_title = download_info['Titulo']
 
-        # Headers para la solicitud
-        request_headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-            'Accept': '*/*',
-            'Accept-Encoding': 'identity;q=1, *;q=0',
-            'Range': 'bytes=0-',
-            'Connection': 'keep-alive',
+    try:
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36',
             'Referer': 'https://www.youtube.com/'
         }
+        response = requests.get(video_url, headers=headers, stream=True)
 
-        def generate():
-            try:
-                # Usar requests para hacer la solicitud con stream=True
-                with requests.get(video_url, headers=request_headers, stream=True) as r:
-                    r.raise_for_status()  # Verificar si hay errores HTTP
-                    for chunk in r.iter_content(chunk_size=8192):
-                        if chunk:
-                            yield chunk
-            except requests.RequestException as e:
-                logging.error(f"Error durante la descarga: {str(e)}")
-                return
+        # Verificar que la URL es accesible antes de iniciar la descarga
+        head_response = requests.head(video_url, headers=headers)
+        if head_response.status_code != 200:
+            return redirect(url_for('index', error='El video no está accesible desde el servidor'))
 
-        # Headers para la respuesta
-        response_headers = {
-            'Content-Disposition': f'attachment; filename="{filename}"',
-            'Content-Type': 'video/mp4',
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-            'Expires': '0'
-        }
-
-        try:
-            # Verificar que la URL es accesible antes de iniciar la descarga
-            head_response = requests.head(video_url, headers=request_headers)
-            head_response.raise_for_status()
-            
-            # Si el servidor proporciona el tamaño del contenido, añadirlo a los headers
-            if 'content-length' in head_response.headers:
-                response_headers['Content-Length'] = head_response.headers['content-length']
-
+        
+        
+        if response.status_code == 200:
             return Response(
-                stream_with_context(generate()),
-                headers=response_headers
+                response.iter_content(chunk_size=1024),
+                content_type=response.headers.get('Content-type', 'application/octet-stream'),
+                headers={
+                    'Content-Disposition': f'attachment; filename="{video_title}.mp4"'
+                }
             )
+        else:
+            return f"Error al descargar el video: Código de estado {response.status_code}", 500
+    except requests.RequestException as e:
+        return f"Error de conexión al intentar descargar el video: {e}", 500
 
-        except requests.RequestException as e:
-            logging.error(f"Error al verificar el video: {str(e)}")
-            return redirect(url_for('index', error='Error al acceder al video'))
-
-    except Exception as e:
-        logging.error(f"Error en descarga: {str(e)}")
-        return redirect(url_for('index', error='Error durante la descarga')) """
 
 @app.errorhandler(404)
 def page_not_found(e):
