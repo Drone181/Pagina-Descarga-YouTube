@@ -53,7 +53,7 @@ def search_video():
         #return jsonify({'error': 'Por favor ingrese una URL de YouTube'}), 400
         return redirect(url_for('index'))
 
-    str = obtener_codigo_video(url)
+    str = obtener_codigo_video(str)
     if str == 0:
         return jsonify({'error': 'URL de video no válida'}), 400
 
